@@ -1,0 +1,23 @@
+I want to create an app using Next.js (use App Router only), Shadcn, Tailwind CSS, lucide-react,and TypeScript.
+
+The app will have a comparison function on the homepage. It should feature one input fields where users can type the names of Crypto.
+Structure:
+* Directory Setup:
+* app/blockchains
+    * Polkadot: Stores all Polkadot parachains, such as Ajuna, Aleph, Astar.
+    * Kusama: Stores all Kusama parachains, such as Bajuna, Acurast, Basilisk.
+    * Solana: Stores all Solana based crypto.
+
+Functionality:
+* Homepage Tabs:
+    * When user type some character suggest them crypto from the Polkadot or kusama or solana or more blockchains folder for comparison.
+    * Step1: one input field should be displayed where users can type the name of a crypto (e.g., "Acurast"). Its should be user choice if he want to type two crypto or one then redirect it to the next step where they can add more crypto for compare, if they want.
+    * step2: Upon pressing enter, the app should generate a dynamic link in the format [example.com/acurast](if one crypto is submitted) or [example.com/acurast-vs-bajuna-vs-..](if two or more crypto is submitted.(see reference 3)
+    * step3: On this page, there should be an "Add Compare" button to include a second crypto for comparison (e.g., "Bajuna")
+    * step4: After selecting a second crypto and pressing the "Add compare" button, the app should update the URL to [example.com/acurast-vs-bajuna] and display the comparison results for the two cryptos.
+Notes:
+* To avoid duplication, the comparison link should be created in a consistent order. For example, "Bajuna" and "Acurast" should result in the link acurast-vs-bajuna, regardless of the input order.
+* For comparisons among cryptos, ensure that the link reflects alphabetical order or another consistent rule, so that "Ajuna" vs. "Astar" and "Astar" vs. "Ajuna" both lead to the same page(example.com/ajuna-astar)(albhabeticaly).
+* I attached the reference from Google Trends.
+Comparison Limitations:
+* A maximum of three comparisons can be created (e.g., Ajuna vs. Aleph, Aleph vs. Astar, Ajuna vs. Astar).

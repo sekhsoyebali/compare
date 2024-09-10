@@ -1,101 +1,85 @@
-import Image from "next/image";
+"use client"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { AutocompleteInput } from "@/components/AutocompleteInput";
+import { allCryptos } from '@/app/blockchains';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [inputs, setInputs] = useState([""]);
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+  const addInput = () => {
+    if (inputs.length < 4) {
+      setInputs(prevInputs => [...prevInputs, ""]);
+    }
+  };
+
+  const removeInput = (index: number) => {
+    setInputs(prevInputs => prevInputs.filter((_, i) => i !== index));
+  };
+
+  const handleInputChange = (index: number, value: string) => {
+    setInputs(prevInputs => {
+      const newInputs = [...prevInputs];
+      newInputs[index] = value;
+      return newInputs;
+    });
+  };
+
+  const handleSuggestionSelect = (index: number, value: string) => {
+    handleInputChange(index, value);
+    if (index === inputs.length - 1 && inputs.length < 4) {
+      addInput();
+    }
+  };
+
+  const handleCompare = () => {
+    const validInputs = inputs
+      .filter(input => input.trim() !== '')
+      .map(input => {
+        const matchedCrypto = Object.values(allCryptos).find(
+          crypto => crypto.name.toLowerCase() === input.toLowerCase() ||
+                    crypto.id.toLowerCase() === input.toLowerCase()
+        );
+        return matchedCrypto ? matchedCrypto.id : null;
+      })
+      .filter(Boolean);
+
+    if (validInputs.length > 0) {
+      const sortedInputs = validInputs.sort();
+      const comparisonLink = `/${sortedInputs.join('-vs-')}`;
+      router.push(comparisonLink);
+    }
+  };
+
+  return (
+    <main className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
+      <h1 className="text-6xl md:text-8xl font-bold mb-4">
+        compare <span className="text-blue-400">crypto</span>
+      </h1>
+      <p className="text-xl md:text-2xl mb-12">
+        Polkadot, Kusama, Solana, and more blockchains
+      </p>
+      <div className="w-full max-w-2xl space-y-4">
+        {inputs.map((input, index) => (
+          <AutocompleteInput
+            key={index}
+            value={input}
+            onChange={(value) => handleInputChange(index, value)}
+            onSelect={(value) => handleSuggestionSelect(index, value)}
+            onRemove={index > 0 ? () => removeInput(index) : undefined}
+            placeholder="Type crypto name to compare"
+            selectedCryptos={inputs.filter(Boolean)}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        ))}
+        <Button 
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full"
+          onClick={handleCompare}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          Compare
+        </Button>
+      </div>
+    </main>
   );
 }
